@@ -4,75 +4,6 @@ import tkinter as tk
 import json
 import requests
 
-"""dictionary from OpenWeather.org
- {
-"coord": {"lon": -0.13,"lat": 51.51},
-"weather": [{"id": 300, "main": "Drizzle", 
-"description": "light intensity drizzle", "icon": "09d"}],
-"base": "stations",
-"main": {"temp": 280.32,"pressure": 1012,"humidity": 81,"temp_min": 279.15,"temp_max": 281.15},
-"visibility": 10000,
-"wind": {"speed": 4.1,"deg": 80},
-"clouds": {"all": 90},
-"dt": 1485789600,
-"sys": {"type": 1,"id": 5091,"message": 0.0103,"country": "GB","sunrise": 1485762037,"sunset": 1485794875},
-"id": 2643743,
-"name": "London",
-"cod": 200
-}
-"""
-# dict for imperial units
-"""
-{
-   "message":"accurate",
-   "cod":"200",
-   "count":1,
-   "list":[
-      {
-         "id":2643743,
-         "name":"London",
-         "coord":{
-            "lat":51.5085,
-            "lon":-0.1258
-         },
-         "main":{
-            "temp":7,
-            "pressure":1012,
-            "humidity":81,
-            "temp_min":5,
-            "temp_max":8
-         },
-         "dt":1485791400,
-         "wind":{
-            "speed":4.6,
-            "deg":90
-         },
-         "sys":{
-            "country":"GB"
-         },
-         "rain":null,
-         "snow":null,
-         "clouds":{
-            "all":90
-         },
-         "weather":[
-            {
-               "id":701,
-               "main":"Mist",
-               "description":"mist",
-               "icon":"50d"
-            },
-            {
-               "id":300,
-               "main":"Drizzle",
-               "description":"light intensity drizzle",
-               "icon":"09d"
-            }
-         ]
-      }
-   ]
-  }
-"""
 
 def get_weather(event):
     api_key = '4b998c307c856e851c23f08fdd34f945'
@@ -81,17 +12,17 @@ def get_weather(event):
     city_name = city_etr.get()
     # api format:
     # api.openweathermap.org/data/2.5/find?q=London&units=imperial
-    api_call = website + city_name + '&units=imperial' + api_key
+    api_call = website + city_name + '&units=imperial&appid=' + api_key
     # call api by request
     response = requests.get(api_call)
 
-    if response.status_code != '404':
+    if response.status_code == 200:
         # json format data
         info = response.json()
-        temp_display.config(text=info['cod'])
-    #    maxt_display.config(text=info )
-    #    mint_display.config(text=info )
-    #    description_display.config(text=info )
+        temp_display.config(text=info["list"][0]["main"]["temp"])
+    # todo   maxt_display.config(text=info )
+    # todo   mint_display.config(text=info )
+    # todo   description_display.config(text=info )
 
     else:
         weather_lbl.config(text="Error:"+str(response.status_code))  # print response code if error
@@ -128,9 +59,10 @@ if __name__=="__main__":
                      bg="#5DADE2", text="Clear", command=clear)
 
     # entry
+    city_var=tk.StringVar()
     city_etr = tk.Entry(root, font=("verdana", 15), relief='ridge', border=6, justify="center",
-                  bg="#744697", width=17)
-    city_etr.bind('<Return>', get_weather)
+                  bg="#744697", width=17, textvariable=city_var)
+    city_etr.bind('<Return>', get_weather)  # todo see if mouse click work
     city_etr.focus()  # focus when open gui
     temp_display = tk.Label(root, font=("verdana", 15), relief='flat', bg='grey', text='-')
     maxt_display = tk.Label(root, font=("verdana", 15), relief='flat', bg='grey', text='-')
