@@ -4,6 +4,7 @@ import tkinter as tk
 import json
 import requests
 
+# TODO add photo based on results
 
 def get_weather(event):
     api_key = '4b998c307c856e851c23f08fdd34f945'
