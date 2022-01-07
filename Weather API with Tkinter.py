@@ -2,12 +2,20 @@
 
 import tkinter as tk
 import json
+from dotenv import load_dotenv
 import requests
+import os
 
-# TODO add photo based on results
+
+load_dotenv()
+
+api_key = os.getenv("api_key_weather")
+
+
+# todo add photo based on results
 
 def get_weather(event):
-    api_key = '4b998c307c856e851c23f08fdd34f945'
+
     website = 'http://api.openweathermap.org/data/2.5/find?q='
     # .get from entry
     city_name = city_etr.get()
@@ -23,7 +31,7 @@ def get_weather(event):
         temp_display.config(text=(str(info["list"][0]["main"]["temp"]) + " deg F"))
         maxt_display.config(text=(str(info["list"][0]["main"]["temp_max"]) + " deg F"))
         mint_display.config(text=(str(info["list"][0]["main"]["temp_min"]) + " deg F"))
-        description_display.config(text=info["list"][0]["weather"]["description"])  # todo fix typeError: list indices must be integers or slices, not str
+        description_display.config(text=str(info["list"][0]["weather"][0]["description"]))  # todo fix typeError: list indices must be integers or slices, not str
 
     else:
         weather_lbl.config(text="Error:"+str(response.status_code))  # print response code if error
