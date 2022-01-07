@@ -2,11 +2,20 @@
 
 import tkinter as tk
 import json
+from dotenv import load_dotenv
 import requests
+import os
 
+
+load_dotenv()
+
+api_key = os.getenv("api_key_weather")
+
+
+# todo add photo based on results
 
 def get_weather(event):
-    api_key = '4b998c307c856e851c23f08fdd34f945'
+
     website = 'http://api.openweathermap.org/data/2.5/find?q='
     # .get from entry
     city_name = city_etr.get()
@@ -19,23 +28,21 @@ def get_weather(event):
     if response.status_code == 200:
         # json format data
         info = response.json()
-        temp_display.config(text=info["list"][0]["main"]["temp"])
-    # todo   maxt_display.config(text=info )
-    # todo   mint_display.config(text=info )
-    # todo   description_display.config(text=info )
+        temp_display.config(text=(str(info["list"][0]["main"]["temp"]) + " deg F"))
+        maxt_display.config(text=(str(info["list"][0]["main"]["temp_max"]) + " deg F"))
+        mint_display.config(text=(str(info["list"][0]["main"]["temp_min"]) + " deg F"))
+        description_display.config(text=str(info["list"][0]["weather"][0]["description"]))  # todo fix typeError: list indices must be integers or slices, not str
 
     else:
         weather_lbl.config(text="Error:"+str(response.status_code))  # print response code if error
 
 
-def clear():
-    pass
-    weather_lbl.config(text="-")
-    city_lbl.config(text="-")
-    temp_lbl.config(text="-")
-    maxt_lbl.config(text="-")
-    mint_lbl.config(text="-")
-    description_lbl.config(text="-")
+def clear():  # clear all fields
+    city_etr.delete(0, tk.END)
+    temp_display.config(text="-")
+    maxt_display.config(text="-")
+    mint_display.config(text="-")
+    description_display.config(text="-")
 
 if __name__=="__main__":
     # create GUI
@@ -55,6 +62,7 @@ if __name__=="__main__":
     # buttons
     tell_btn = tk.Button(root, font=("verdana", 12), anchor="center", relief='raised', border=6,
                      bg="#5DADE2", text="Get the Weather", command=get_weather)
+    tell_btn.bind('<Button-1>', get_weather)   # button bind and enter
     clr_btn = tk.Button(root, font=("verdana", 12), anchor="center", relief='raised', border=6,
                      bg="#5DADE2", text="Clear", command=clear)
 
@@ -62,12 +70,16 @@ if __name__=="__main__":
     city_var=tk.StringVar()
     city_etr = tk.Entry(root, font=("verdana", 15), relief='ridge', border=6, justify="center",
                   bg="#744697", width=17, textvariable=city_var)
-    city_etr.bind('<Return>', get_weather)  # todo see if mouse click work
+    city_etr.bind('<Return>', get_weather)  # button bind and enter
+
+
     city_etr.focus()  # focus when open gui
     temp_display = tk.Label(root, font=("verdana", 15), relief='flat', bg='grey', text='-')
     maxt_display = tk.Label(root, font=("verdana", 15), relief='flat', bg='grey', text='-')
     mint_display = tk.Label(root, font=("verdana", 15), relief='flat', bg='grey', text='-')
-    description_display = tk.Label(root, font=("verdana", 15), relief='flat', bg='grey', text='-')
+    dec_display=tk.StringVar()
+    dec_display.set("-")
+    description_display = tk.Label(root, font=("verdana", 15), relief='flat', bg='grey', textvariable=dec_display)
 
     # .grid
     weather_lbl.grid(row=0, column=0, columnspan=2, pady=5)
